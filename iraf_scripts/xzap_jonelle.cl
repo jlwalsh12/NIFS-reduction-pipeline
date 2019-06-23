@@ -15,8 +15,10 @@ procedure xzap_jonelle (inlist, omasks, outlist, crmasks)
 #
 # The name of the output cosmic ray mask is written into the keyword 
 # CRMASK in both the input and the output images.
-
-# ONLY MODIFICATION IS THAT THIS CALLS MAKEMASK_JONELLE.CL JLW 1/21/17
+#
+# JLW edits to xzap.cl (1/17):
+#
+# modfied so that xzap.cl calls makemask_jonelle.cl
 
 string	inlist	    {prompt="List of input images to be cosmic ray cleaned"}
 string	omasks      {"", prompt="The input object mask keyword or list"}

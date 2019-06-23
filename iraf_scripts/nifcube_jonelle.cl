@@ -8,7 +8,7 @@
 #
 # Complete revision history found in CVS
 #
-# JLW edits (12/29/17):
+# JLW edits to nifcube.cl (12/29/17):
 #
 # nifcube is a wrapper to the more general gemcube. here, nifcube has
 # been modified so that more information could be passed in and

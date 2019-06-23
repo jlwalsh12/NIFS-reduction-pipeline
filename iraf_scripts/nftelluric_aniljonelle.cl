@@ -1,6 +1,6 @@
 # Copyright(c) 2006 Association of Universities for Research in Astronomy, Inc.
 
-procedure nftelluric_anil(inimages,calspec)
+procedure nftelluric_aniljonelle(inimages,calspec)
 
 # Routine to correct telluric absorption in transformed NIFS images.
 #
@@ -20,9 +20,9 @@ procedure nftelluric_anil(inimages,calspec)
 #   - Need to verify the VAR and DQ calculations.  
 #   - Need to add a non-interactive way.
 #
-# JLW edits (12/29/17):
+# JLW edits to nftelluric.cl (12/29/17):
 #
-# same as nftelluric_anil (which has a better treatment of the
+# same as nftelluric_anil.cl (which has a better treatment of the
 # variance extension), but this routine can be run
 # non-interactively. instead, the (x,y) location from which to extract
 # the galaxy 1D spectrum is passed into the routine.
