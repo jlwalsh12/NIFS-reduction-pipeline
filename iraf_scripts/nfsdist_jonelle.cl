@@ -1,6 +1,6 @@
 # Copyright(c) 2006-2012 Association of Universities for Research in Astronomy, Inc.
 
-procedure nfsdist (inimages) 
+procedure nfsdist_jonelle (inimages) 
 
 # Measure the S-distortion of GNIRS/NIRI spectra
 # This task establishes the calibration using stepped images of a star 
@@ -11,7 +11,7 @@ procedure nfsdist (inimages)
 #          Oct 29, 2003  KL moved from niri to gnirs package
 #          Oct 24, 2005  PM Modified for NIFS
 
-# JLW edits (12/29/17):
+# JLW edits to nfsdist.cl (12/29/17):
 #
 # (1) before default sample was just "" instead of "*" as it should be
 # (according to the help for nfsdist). autoidentify does not work
