@@ -20,7 +20,7 @@ procedure nftelluric_anil(inimages,calspec)
 #   - Need to verify the VAR and DQ calculations.  
 #   - Need to add a non-interactive way.
 #
-# ACS edits (11/08):
+# ACS edits to nftelluric.cl (11/08):
 #
 # modified to do a better treatment of the variance extensions.
 
