@@ -1,11 +1,5 @@
 pro find_offsets_lp, dir, files
-  
-;uses the collapsed galaxy data cubes to determine the spatial offsets
-;between each cube. routine calculates the offsets in 3 ways: by
-;finding the location of the maximum flux value of the image, by
-;fitting a 2D gaussian to the image to get the central location, and
-;by cross-correlating the images.
-  
+
 if n_elements(files) GT 1 then begin
    print, ''
    print, 'Now calculating the spatial offsets between the collapsed '+$
@@ -49,9 +43,8 @@ for i = 0, n_elements(files)-1 do begin
    xtrimdown = xmax-15 > 0
    xtrimup = xmax+15 < (size(img_tmp))[1] - 1
    ytrimdown = ymax-15 > 0
-   ytrimup = ymax+1 < (size(img_tmp))[2] - 1
-   yfit = mpfit2dpeak(img_tmp[xtrimdown:xtrimup,ytrimdown:ytrimup], $
-                      bestparam, /gaussian)
+   ytrimup = ymax+15 < (size(img_tmp))[2] - 1
+   yfit = mpfit2dpeak(img_tmp[xtrimdown:xtrimup,ytrimdown:ytrimup], bestparam, /gaussian)
    xcen_gauss = bestparam[4]+xtrimdown & ycen_gauss = bestparam[5]+ytrimdown
    cen_gauss_final[0,i] = xcen_gauss & cen_gauss_final[1,i] = ycen_gauss
 
@@ -88,8 +81,7 @@ if checkastr NE 'RA---TAN' then begin
    stop
 endif
 xy2ad, cen_max_final[0,0], cen_max_final[1,0], astr, ra_deg_max, dec_deg_max
-xy2ad, cen_gauss_final[0,0], cen_gauss_final[1,0], astr, ra_deg_gauss, $
-       dec_deg_gauss
+xy2ad, cen_gauss_final[0,0], cen_gauss_final[1,0], astr, ra_deg_gauss, dec_deg_gauss
 
 ;calculate the offsets using a cross-correlation
 if n_elements(files) GT 1 then begin
@@ -121,19 +113,16 @@ pixscale = sxpar(head, 'PIXSCALE')
 forprint, offsets_max_final[0,*], offsets_max_final[1,*], format='(2f15.3)', $
           textout=dir+'offset_max.list', /silent, $
           comment='#x,y offsets (pixels, pix='+$
-          strcompress(string(pixscale),/remove_all)+'") needed to match '+$
-          'first entry'
-forprint, offsets_gauss_final[0,*], offsets_gauss_final[1,*], $
-          format='(2f15.3)', textout=dir+'offset_gauss.list', /silent, $
+          strcompress(string(pixscale),/remove_all)+'") needed to match first entry'
+forprint, offsets_gauss_final[0,*], offsets_gauss_final[1,*], format='(2f15.3)', $
+          textout=dir+'offset_gauss.list', /silent, $
           comment='#x,y offsets (pixels, pix='+$
-          strcompress(string(pixscale),/remove_all)+'") needed to match '+$
-          'first entry'
+          strcompress(string(pixscale),/remove_all)+'") needed to match first entry'
 if n_elements(files) GT 1 then $
    forprint, offsets_crosscorr_final[0,*], offsets_crosscorr_final[1,*], $
              format='(2f15.3)', textout=dir+'offset_crosscorr.list', /silent, $
              comment='#x,y offsets (pixels, pix='+$
-             strcompress(string(pixscale),/remove_all)+'") needed to match'+$
-             ' first entry'
+             strcompress(string(pixscale),/remove_all)+'") needed to match first entry'
 
 ;print the x and y reference pixels (i.e., crpix1 and crpix2) and the
 ;ra and dec (i.e., crval1 and crval2). need to conform to the fits
