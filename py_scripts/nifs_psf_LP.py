@@ -208,7 +208,6 @@ def nifs_psf_LP(workdir, caldir, teldir, date, flatlist, arclist, ronchilist,
             iraf.nftelluric_aniljonelle('tfbrsn'+psfexps[i],
                                         (telcorr[i].split('/'))[1],
                                         fl_inter='no', fl_flux='no',
-                                        sample='23000:24100',
                                         xc=x_nfextract, yc=y_nfextract,
                                         logfile=log)
 
@@ -229,7 +228,7 @@ def nifs_psf_LP(workdir, caldir, teldir, date, flatlist, arclist, ronchilist,
               
             iraf.nftelluric_anil('tfbrsn'+psfexps[i],(telcorr[i].split('/'))[1],
                                  fl_inter='yes', fl_flux='no',
-                                 sample='23000:24100', logfile=log)
+                                 logfile=log)
         
         #remove the copy of the telluric star now that the psf
         #exposure has been reduced

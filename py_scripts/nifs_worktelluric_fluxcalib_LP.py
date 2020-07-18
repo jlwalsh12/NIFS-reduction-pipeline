@@ -120,7 +120,6 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
             iraf.nftelluric_aniljonelle('tfbrsn'+telstar_calib_file,
                                         telcorr[0], fl_inter='no',
                                         fl_flux='no',
-                                        sample='23000:24100',
                                         xc=x_nfextract, yc=y_nfextract,
                                         logfile=log)
 
@@ -141,7 +140,7 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
               
             iraf.nftelluric_anil('tfbrsn'+telstar_calib_file,telcorr[0],
                                  fl_inter='yes', fl_flux='no',
-                                 sample='23000:24100', logfile=log)
+                                 logfile=log)
 
     
         #######################################################################
