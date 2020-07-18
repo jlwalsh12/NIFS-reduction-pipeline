@@ -252,7 +252,6 @@ def nifs_galaxy_LP(workdir, caldir, teldir, date, flatlist, arclist,
             iraf.nftelluric_aniljonelle('tfbrsn'+galexps[i],
                                         (telcorr[i].split('/'))[1],
                                         fl_inter='no', fl_flux='no',
-                                        sample='23000:24100',
                                         xc=x_nfextract, yc=y_nfextract,
                                         logfile=log)
     
@@ -274,7 +273,7 @@ def nifs_galaxy_LP(workdir, caldir, teldir, date, flatlist, arclist,
               
             iraf.nftelluric_anil('tfbrsn'+galexps[i],(telcorr[i].split('/'))[1],
                                  fl_inter='yes', fl_flux='no',
-                                 sample='23000:24100',logfile=log)
+                                 logfile=log)
         
         if len(darklist) > 0:
             
