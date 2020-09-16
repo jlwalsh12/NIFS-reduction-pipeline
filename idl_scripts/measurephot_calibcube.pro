@@ -129,33 +129,39 @@ modfits, rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
          galaxy+'_combined_flux.fits', outvar, exten_no=2
 
 
-;repeat for the sky cube
+;repeat for the sky cube if one exists
 
-;copy the sky infile to the outfile. will modify the outfile.
-spawn, 'cp '+rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
-       galaxy+'_sky_combined.fits '+rootdir+reducedir+galaxy+$
-       '/merged/'+obs_setup+'/'+galaxy+'_sky_combined_flux.fits'
+exist_test = file_test(rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
+                       galaxy+'_sky_combined.fits')
 
-;read in the main header, the cube, and the variance cube
-cube = readfits(rootdir+reducedir+galaxy+'/merged/'+obs_setup+$
-                '/'+galaxy+'_sky_combined.fits', exten_no=1)
-var = readfits(rootdir+reducedir+galaxy+'/merged/'+obs_setup+$
-               '/'+galaxy+'_sky_combined.fits', exten_no=2)
+if exist_test EQ 1 then begin
 
-;flux calibrate each spectrum of the cube
-outcube = cube
-outvar = var
-for i=0, (size(cube))[1]-1 do begin
-   for j=0, (size(cube))[2]-1 do begin
-      outcube[i,j,*] = cube[i,j,*] * conversion
-      outvar[i,j,*] = var[i,j,*] * conversion^2
+   ;copy the sky infile to the outfile. will modify the outfile.
+   spawn, 'cp '+rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
+          galaxy+'_sky_combined.fits '+rootdir+reducedir+galaxy+$
+          '/merged/'+obs_setup+'/'+galaxy+'_sky_combined_flux.fits'
+
+   ;read in the main header, the cube, and the variance cube
+   cube = readfits(rootdir+reducedir+galaxy+'/merged/'+obs_setup+$
+                   '/'+galaxy+'_sky_combined.fits', exten_no=1)
+   var = readfits(rootdir+reducedir+galaxy+'/merged/'+obs_setup+$
+                  '/'+galaxy+'_sky_combined.fits', exten_no=2)
+
+   ;flux calibrate each spectrum of the cube
+   outcube = cube
+   outvar = var
+   for i=0, (size(cube))[1]-1 do begin
+      for j=0, (size(cube))[2]-1 do begin
+         outcube[i,j,*] = cube[i,j,*] * conversion
+         outvar[i,j,*] = var[i,j,*] * conversion^2
+      endfor
    endfor
-endfor
 
-;modify the output fits file
-modfits, rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
-         galaxy+'_sky_combined_flux.fits', outcube, exten_no=1
-modfits, rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
-         galaxy+'_sky_combined_flux.fits', outvar, exten_no=2
+   ;modify the output fits file
+   modfits, rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
+            galaxy+'_sky_combined_flux.fits', outcube, exten_no=1
+   modfits, rootdir+reducedir+galaxy+'/merged/'+obs_setup+'/'+$
+            galaxy+'_sky_combined_flux.fits', outvar, exten_no=2
+endif
 
 end
