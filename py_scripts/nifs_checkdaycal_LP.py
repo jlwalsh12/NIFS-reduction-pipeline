@@ -15,7 +15,7 @@ def nifs_checkdaycal_LP(rootdir, reducedir, datadir, dates):
     for i in range(len(dates)):
     
         os.chdir(rootdir+reducedir+'daycals/'+dates[i])
-        obs_setups = glob.glob('*')
+        obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
         for j in range(len(obs_setups)):
         
@@ -30,8 +30,8 @@ def nifs_checkdaycal_LP(rootdir, reducedir, datadir, dates):
             arcdarklist = 'arcdarklist'
             ronchilist = 'ronchilist'
             ronchidarklist = 'ronchidarklist'
-            arclist = glob.glob('arclist*')
-            darklist = glob.glob('darklist*')
+            arclist = sorted(glob.glob('arclist*'), key=os.path.basename)
+            darklist = sorted(glob.glob('darklist*'), key=os.path.basename)
 
             #have the user check/modify the calibration lists
             if len(darklist) > 0:

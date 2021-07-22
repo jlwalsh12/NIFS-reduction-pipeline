@@ -27,7 +27,7 @@ def nifs_checkgal_LP(rootdir, reducedir, datadir, galaxies, dates):
             if os.path.isdir(rootdir+reducedir+galaxies[i]+'/'+dates[j]):
 
                 os.chdir(rootdir+reducedir+galaxies[i]+'/'+dates[j])
-                obs_setups = glob.glob('*')
+                obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
                 for k in range(len(obs_setups)):
 

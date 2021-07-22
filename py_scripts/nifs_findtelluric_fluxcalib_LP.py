@@ -18,7 +18,7 @@ def nifs_findtelluric_fluxcalib_LP(begindir, workdir, galname, obs_setup):
     #read in the header of the merged galaxy cube to find the file
     #name of one of the telluric stars. this star will be used to do
     #the flux calibration.
-    checkfile = glob.glob(galname+'_combined.fits')
+    checkfile = sorted(glob.glob(galname+'_combined.fits'),key=os.path.basename)
     if len(checkfile) == 1:
         tmp = pyfits.open(galname+'_combined.fits')
         telfile_calib = tmp[0].header['NFTELCAL']
@@ -35,14 +35,15 @@ def nifs_findtelluric_fluxcalib_LP(begindir, workdir, galname, obs_setup):
     #track down which telluric star the file name belongs to
     checkteldir = begindir+'tellurics/'+date_tel+'/'+obs_setup+'/'
     os.chdir(checkteldir)
-    checktelstar = glob.glob('*')
+    checktelstar = sorted(glob.glob('*'),key=os.path.basename)
 
     telstar_calib = ''
     for i in range(len(checktelstar)):
         
         os.chdir(begindir+'tellurics/'+date_tel+'/'+obs_setup+\
                  '/'+checktelstar[i])
-        checktel = glob.glob('N'+date_tel+frame_tel+'.fits')
+        checktel = sorted(glob.glob('N'+date_tel+frame_tel+'.fits'),
+                          key=os.path.basename)
         if len(checktel) == 1:
             telstar_calib = begindir+'tellurics/'+date_tel+'/'+\
               obs_setup+'/'+checktelstar[i]+'/'

@@ -10,7 +10,7 @@ def nifs_telluric_LP(workdir, caldir, date, flatlist, arclist, ronchilist,
                      flinter_extract):
 
     ###########################################################################
-    #  STEP 1: Prepare IRAF  		                                          #
+    #  STEP 1: Prepare IRAF  		                                      #
     ###########################################################################
 
     import sys

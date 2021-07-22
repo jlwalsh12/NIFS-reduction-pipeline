@@ -3,8 +3,8 @@
 Created on June 11 2018
 Author: Jonelle Walsh, Anil Seth, Richard McDermid, etc.
 
-See setup_pipeline.pdf for installation instructions, and xx.pdf for
-xx useage instructions.
+See setup_pipeline.pdf for installation instructions, and
+additional_info_nifspipeline_v4.pdf for useage instructions.
 
 To run, go to the rootdir (see below), open pyraf, then type:
 ---> pyexecute("[pyscriptpath (see below)]/nifs_main_LP.py")
@@ -63,20 +63,10 @@ dates = ['20160921']
 #name the directoires.
 #galaxies = ['ngc7242','ugc11537','pgc12557'] #for 20160921
 galaxies = ['ugc11537']
-#galaxies = ['ugc11537','ngc772'] #for 20160920
-#galaxies = ['ngc7242','ngc1589'] #for 20160919
-#galaxies = ['ngc1589'] #for 20160918
-#galaxies = ['ngc7242'] #for 20160928
-#galaxies = ['ngc7242','ngc1022'] #for 20160925
 #tellurics observed during ANY of the dates listed above. use full
 #name and lower case (e.g., hip, hd, hr). will be used to name the
 #directories.
-#tellurics = ['hip105437','hip95793','hd203769','hip10559','hip18769'] #for 20160921
-#tellurics = ['hip95793','hd203769','hip1603','hd19600'] #for 20160920
-#tellurics = ['hip105437','hip114714','hip13917','hip24607'] #for 20160919
-#tellurics = ['hip13917','hip24607']  #for 20160918
-#tellurics = ['hip105437','hip114714'] #for 20160928
-tellurics = ['hd123233','*8her']
+tellurics = ['hip105437','hip95793','hd203769','hip10559','hip18769'] #for 20160921
 
 #you can chose to do some parts of the reduction and not others. to do
 #the step enter 'yes', to skip the step enter 'no'.
@@ -220,7 +210,7 @@ for a in range(len(dates)):
     if reduce_daycals.lower() == 'yes' or reduce_tellurics.lower() == 'yes': 
 
         os.chdir(rootdir+reducedir+'daycals/'+dates[a])
-        obs_setups = glob.glob('*')
+        obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
         for b in range(len(obs_setups)):
 
@@ -235,8 +225,8 @@ for a in range(len(dates)):
             arcdarklist = 'arcdarklist'
             ronchilist = 'ronchilist'
             ronchidarklist = 'ronchidarklist'
-            arclist = glob.glob('arclist*')
-            darklist = glob.glob('darklist*')
+            arclist = sorted(glob.glob('arclist*'), key=os.path.basename)
+            darklist = sorted(glob.glob('darklist*'), key=os.path.basename)
 
             ####################################################################
         
@@ -276,7 +266,7 @@ for a in range(len(dates)):
             
                 os.chdir(rootdir+reducedir+'tellurics/'+dates[a]+'/'+\
                         obs_setups[b]+'/')
-                telluric_stars = glob.glob('*')
+                telluric_stars = sorted(glob.glob('*'), key=os.path.basename)
         
                 for c in range(len(telluric_stars)):
         
@@ -301,9 +291,12 @@ for a in range(len(dates)):
                     nifs_checkdata_LP(workdir,'telluric*log*')
 
                     #the names of the telluric and sky lists
-                    telluriclist = glob.glob('telluriclist*')
-                    skylist = glob.glob('skylist_*')
-                    skylistshort = glob.glob('skylistshort_*')
+                    telluriclist = sorted(glob.glob('telluriclist*'),
+                                          key=os.path.basename)
+                    skylist = sorted(glob.glob('skylist_*'),
+                                     key=os.path.basename)
+                    skylistshort = sorted(glob.glob('skylistshort_*'),
+                                          key=os.path.basename)
 
                     #remind the user to open a ds9 window if needed
                     if flinter_extract == 'yes':
@@ -321,7 +314,8 @@ for a in range(len(dates)):
                     #and correct for the blackbody shape. the output
                     #1D spectrum is ready to be fed into nftelluric to
                     #make the telluric correction.
-                    telluric_file = glob.glob('gxtfbrsn*.fits')
+                    telluric_file = sorted(glob.glob('gxtfbrsn*.fits'),
+                                           key=os.path.basename)
                     idl.pro('fit_telluric_richard',workdir,telluric_file,refdir)
 
 ################################################################################
@@ -336,7 +330,7 @@ for a in range(len(galaxies)):
         if os.path.isdir(rootdir+reducedir+galaxies[a]+'/'+dates[b]):
 
             os.chdir(rootdir+reducedir+galaxies[a]+'/'+dates[b])
-            obs_setups = glob.glob('*')
+            obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
             for c in range(len(obs_setups)):
 
@@ -352,8 +346,8 @@ for a in range(len(galaxies)):
                 flatlist = 'flatlist'
                 ronchilist = 'ronchilist'
                 os.chdir(caldir)
-                arclist = glob.glob('arclist*')
-                darklist = glob.glob('darklist*')
+                arclist = sorted(glob.glob('arclist*'), key=os.path.basename)
+                darklist = sorted(glob.glob('darklist*'), key=os.path.basename)
                 #the names of the galaxy, sky, and telluric correction
                 #lists
                 os.chdir(workdir)
@@ -398,7 +392,7 @@ for a in range(len(galaxies)):
     if reduce_combine_gal.lower() == 'yes':
 
         os.chdir(rootdir+reducedir+galaxies[a]+'/merged/')
-        obs_setups = glob.glob('*')
+        obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
         for b in range(len(obs_setups)):
 
@@ -414,18 +408,29 @@ for a in range(len(galaxies)):
 
             #check that at least one atbrsn*.fits file exists
             os.chdir(workdir)
-            gal_images = glob.glob('image_catfbrsn*.fits')
+            gal_images = sorted(glob.glob('image_catfbrsn*.fits'),
+                                key=os.path.basename)
+            
             if len(gal_images) == 0:
                 sys.exit('Cannot find any image_catfbrsn*.fits '+\
                          'files in '+workdir+'.')
+
+            np.savetxt('gal_fileorder_for_offsetfiles.txt',
+                       np.column_stack([gal_images]),fmt="%s")
+                
             #get the galaxy exposure file names (atfbrsn*.fits) from
             #the image file names
             gal_exps = []
             for c in range(len(gal_images)):
                 gal_exps.append( (gal_images[c])[7:] )
-
+                
             #get the sky exposure names, if they exist
-            sky_exps = glob.glob('atfbrsn*_*.fits')
+            sky_exps = sorted(glob.glob('atfbrsn*_*.fits'),
+                              key=os.path.basename)
+
+            if len(sky_exps) > 0:
+                np.savetxt('sky_fileorder_for_offsetfiles.txt',
+                           np.column_stack([sky_exps]),fmt="%s")
 
             #get the reference wavelength, which includes making a
             #barycentric or heliocentric correction (if the user
@@ -468,7 +473,7 @@ if reduce_psf.lower() == 'yes':
         if os.path.isdir(rootdir+reducedir+'psfs/'+dates[a]):
 
             os.chdir(rootdir+reducedir+'psfs/'+dates[a])
-            obs_setups = glob.glob('*')
+            obs_setups = sorted(glob.glob('*'),key=os.path.basename)
     
             for b in range(len(obs_setups)):
 
@@ -492,7 +497,8 @@ if reduce_psf.lower() == 'yes':
                             flatlist = 'flatlist'
                             ronchilist = 'ronchilist'
                             os.chdir(caldir)
-                            arclist = glob.glob('arclist*')
+                            arclist = sorted(glob.glob('arclist*'),
+                                             key=os.path.basename)
                             #the names of the psf, sky, and telluric correction
                             #lists
                             os.chdir(workdir)
@@ -529,11 +535,17 @@ if reduce_psf.lower() == 'yes':
 
                             #check that at least one atbrsn*.fits file exists
                             os.chdir(workdir)
-                            psf_images = glob.glob('image_catfbrsn*.fits')
+                            psf_images = \
+                                sorted(glob.glob('image_catfbrsn*.fits'),
+                                       key=os.path.basename)
+                            
                             if len(psf_images) == 0:
                                 sys.exit('Cannot find any '+\
                                          'image_catfbrsn*.fits '+\
                                          'files in '+workdir+'.')
+
+                            np.savetxt('psf_fileorder_for_offsetfiles.txt',
+                                       np.column_stack([psf_images]),fmt="%s")
 
                             #get the psf exposure file names (atfbrsn*.fits)
                             #from the image file names
@@ -576,7 +588,7 @@ if reduce_psf.lower() == 'yes':
 if reduce_combine_psf.lower() == 'yes':
 
     os.chdir(rootdir+reducedir+'psfs/merged')
-    obs_setups = glob.glob('*')
+    obs_setups = sorted(glob.glob('*'),key=os.path.basename)
 
     for a in range(len(obs_setups)):
             
@@ -599,10 +611,14 @@ if reduce_combine_psf.lower() == 'yes':
 
                 #check that at least one atbrsn*.fits file exists
                 os.chdir(workdir)
-                psf_images = glob.glob('image_catfbrsn*.fits')
+                psf_images = sorted(glob.glob('image_catfbrsn*.fits'),
+                                    key=os.path.basename)
                 if len(psf_images) == 0:
                     sys.exit('Cannot find any image_catfbrsn*.fits '+\
                                  'files in '+workdir+'.')
+
+                np.savetxt('psf_fileorder_for_offsetfiles.txt',
+                           np.column_stack([psf_images]),fmt="%s")
                       
                 #get the psf exposure file names (atfbrsn*.fits) from
                 #the image file names
@@ -639,7 +655,7 @@ if reduce_fluxcal.lower() == 'yes':
     for a in range(len(galaxies)):
 
         os.chdir(rootdir+reducedir+galaxies[a]+'/merged')
-        obs_setups = glob.glob('*')
+        obs_setups = sorted(glob.glob('*'),key=os.path.basename)
 
         for b in range(len(obs_setups)):
             
@@ -679,7 +695,7 @@ if reduce_measurelsf.lower() == 'yes':
     for a in range(len(galaxies)):
 
         os.chdir(rootdir+reducedir+galaxies[a]+'/merged')
-        obs_setups = glob.glob('*')
+        obs_setups = sorted(glob.glob('*'),key=os.path.basename)
 
         for b in range(len(obs_setups)):
             

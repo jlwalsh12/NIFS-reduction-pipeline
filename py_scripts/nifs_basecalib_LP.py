@@ -10,7 +10,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                       refdir, flinter_arc, flinter_sdist):
 
     ###########################################################################
-    #  STEP 1: Prepare IRAF  		                                          #
+    #  STEP 1: Prepare IRAF  		                                      #
     ###########################################################################
 
     import sys
@@ -70,7 +70,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
 
         
     ###########################################################################
-    #  STEP 2: Determine the shift to the MDF file  		                  #
+    #  STEP 2: Determine the shift to the MDF file  		              #
     ###########################################################################
     
     iraf.nfprepare(calflat, rawpath='', outpref='s', shiftx='INDEF',
@@ -79,7 +79,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
     
     
     ###########################################################################
-    #  STEP 3: Make the Flat Field and BPM  		                          #
+    #  STEP 3: Make the Flat Field and BPM  		                      #
     ###########################################################################
         
     iraf.nfprepare('@'+flatlist, rawpath='', shiftim='s'+calflat,
@@ -89,7 +89,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
     iraf.nfprepare('@'+flatdarklist, rawpath='', shiftim='s'+calflat,
                     fl_vardq='yes', fl_inter='yes', fl_corr='no',
                     fl_nonl='no', logfile=log)
-    
+     
     iraf.gemcombine('n//@'+flatlist, output='gn'+calflat, fl_dqpr='yes',
                     fl_vardq='yes', masktype='none', logfile=log)
     iraf.gemcombine('n//@'+flatdarklist, output='gn'+flatdark, fl_dqpr='yes',
@@ -202,7 +202,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
     iraf.nfprepare('@'+ronchidarklist, rawpath='', shiftimage='s'+calflat,
                     bpm='rgn'+calflat+'_sflat_bpm.pl', fl_vardq='yes',
                     fl_corr='no', fl_nonl='no', logfile=log)
-
+    
     #determine the number of input Ronchi calibration mask files and
     #Ronchi dark files so that the routine runs automatically for
     #single or multiple files.
@@ -213,7 +213,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                         logfile=log)
     else:
         iraf.copy('n'+ronchiflat+'.fits','gn'+ronchiflat+'.fits')
-
+    
     nfiles = len(open(ronchidarklist).readlines())
     if nfiles > 1:
         iraf.gemcombine('n//@'+ronchidarklist, output='gn'+ronchiflatdark,
@@ -221,7 +221,7 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                         logfile=log)
     else:
         iraf.copy('n'+ronchiflatdark+'.fits','gn'+ronchiflatdark+'.fits')
-
+    
     iraf.nsreduce('gn'+ronchiflat, outpref='r', dark='gn'+ronchiflatdark,
                   flatimage='rgn'+calflat+'_flat', fl_cut='yes',
                   fl_nsappw='yes', fl_flat='yes', fl_sky='no', fl_dark='yes',

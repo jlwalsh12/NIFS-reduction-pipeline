@@ -13,7 +13,7 @@ def nifs_psf_LP(workdir, caldir, teldir, date, flatlist, arclist, ronchilist,
 
                 
     ###########################################################################
-    #  STEP 1: Prepare IRAF  		                                          #
+    #  STEP 1: Prepare IRAF  		                                      #
     ###########################################################################
 
     #import some useful python utilities

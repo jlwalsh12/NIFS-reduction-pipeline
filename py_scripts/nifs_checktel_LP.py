@@ -18,13 +18,13 @@ def nifs_checktel_LP(rootdir, reducedir, datadir, dates):
     for i in range(len(dates)):
 
         os.chdir(rootdir+reducedir+'tellurics/'+dates[i])
-        obs_setups = glob.glob('*')
+        obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
         for j in range(len(obs_setups)):
 
             os.chdir(rootdir+reducedir+'tellurics/'+dates[i]+'/'+\
                      obs_setups[j]+'/')
-            telluric_stars = glob.glob('*')
+            telluric_stars = sorted(glob.glob('*'), key=os.path.basename)
 
             for k in range(len(telluric_stars)):
 
@@ -34,9 +34,12 @@ def nifs_checktel_LP(rootdir, reducedir, datadir, dates):
                 os.chdir(workdir)
 
                 #the names of the telluric and sky lists
-                telluriclist = glob.glob('telluriclist*')
-                skylist = glob.glob('skylist_*')
-                skylistshort = glob.glob('skylistshort_*')
+                telluriclist = sorted(glob.glob('telluriclist*'),
+                                      key=os.path.basename)
+                skylist = sorted(glob.glob('skylist_*'),
+                                      key=os.path.basename)
+                skylistshort = sorted(glob.glob('skylistshort_*'),
+                                      key=os.path.basename)
 
                 #have the user check/modify the telluric and sky lists
                 listnames = [telluriclist,skylist,skylistshort]

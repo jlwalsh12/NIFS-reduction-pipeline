@@ -11,6 +11,7 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
 
     #import some useful python utilities
     import os
+    import sys
     import time
     import glob
     import shutil
@@ -31,7 +32,7 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
         print('')
     
         ###################################################################
-        #  STEP 1: Prepare IRAF  		                                  #
+        #  STEP 1: Prepare IRAF  		                          #
         ###################################################################
     
         #import the pyraf module and relevant packages
@@ -69,7 +70,7 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
 
     
         ####################################################################
-        #  STEP 2: Telluric Correct the Telluric Star  		               #
+        #  STEP 2: Telluric Correct the Telluric Star  		           #
         ####################################################################
 
         #in order to extract a 1D spectrum from the 2D data
@@ -106,7 +107,10 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
                              stderr=open(os.devnull,'w'))
 
         #correct the telluric star for telluric absorption features
-        telcorr = glob.glob('*final.fits')
+        telcorr = glob.glob('*'+telstar_calib_file+'*final.fits')
+        if len(telcorr) > 1:
+            sys.exit('Found multiple *'+telstar_calib_file+\
+                     '*final.fits files in '+workdir+'.')
         
         #the telluric correction. below the extraction of a 1D
         #telluric spectrum and the determination of the shift/scale
@@ -144,7 +148,7 @@ def nifs_worktelluric_fluxcalib_LP(telstar_calib_dir, telstar_calib_file,
 
     
         #######################################################################
-        #  STEP 3: Create Cube of Telluric Corrected Telluric Star  		  #
+        #  STEP 3: Create Cube of Telluric Corrected Telluric Star  	      #
         #######################################################################
 
         iraf.nifcube(inimages='atfbrsn'+telstar_calib_file, sscale=0.05,

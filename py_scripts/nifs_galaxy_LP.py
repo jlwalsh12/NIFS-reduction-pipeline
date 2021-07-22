@@ -12,7 +12,7 @@ def nifs_galaxy_LP(workdir, caldir, teldir, date, flatlist, arclist,
                    flinter_nsfitcoords, flinter_telluric):
 
     ###########################################################################
-    #  STEP 1: Prepare IRAF  		                                          #
+    #  STEP 1: Prepare IRAF  		                                      #
     ###########################################################################
 
     import os

@@ -24,7 +24,7 @@ def nifs_checkpsf_LP(rootdir, reducedir, datadir, galaxies, dates):
         if os.path.isdir(rootdir+reducedir+'psfs/'+dates[i]):
 
             os.chdir(rootdir+reducedir+'psfs/'+dates[i])
-            obs_setups = glob.glob('*')
+            obs_setups = sorted(glob.glob('*'), key=os.path.basename)
 
             for j in range(len(obs_setups)):
                 for k in range(len(galaxies)):
