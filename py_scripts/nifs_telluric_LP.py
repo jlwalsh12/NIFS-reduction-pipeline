@@ -7,7 +7,7 @@ IRAF reduction tasks (or modified Gemini IRAF reduction tasks).
 
 def nifs_telluric_LP(workdir, caldir, date, flatlist, arclist, ronchilist,
                      telluriclist, skylist, skylistshort, flinter_nsfitcoords,
-                     flinter_extract):
+                     flinter_extract, obs_setup):
 
     ###########################################################################
     #  STEP 1: Prepare IRAF  		                                      #
@@ -111,10 +111,21 @@ def nifs_telluric_LP(workdir, caldir, date, flatlist, arclist, ronchilist,
                           'sn'+telluricexps[j], fl_vardq='yes', logfile=log)
 
         #cut the slices and flat field the telluric data
-        iraf.nsreduce('sn@'+telluriclist[i], outpref='r',
-                      flatim='rgn'+calflat+'_flat', fl_cut='yes',
-                      fl_nsappw='no', fl_vardq='yes', fl_sky='no',
-                      fl_dark='no', fl_flat='yes', logfile=log)
+        
+        #use different calls to nsreduce depending on the
+        #observational setup. the pipeline will have already quit if
+        #one of these two setups were not used.
+        if obs_setup == 'hk_2.20':
+            iraf.nsreduce('sn@'+telluriclist[i], outpref='r',
+                          flatim='rgn'+calflat+'_flat', fl_cut='yes',
+                          fl_nsappw='no', fl_vardq='yes', fl_sky='no',
+                          fl_dark='no', fl_flat='yes', logfile=log)
+        if obs_setup == 'hk_2.30':
+            iraf.nsreduce('sn@'+telluriclist[i], outpref='r',
+                          flatim='rgn'+calflat+'_flat', fl_cut='yes',
+                          fl_nsappw='no', fl_vardq='yes', fl_sky='no',
+                          fl_dark='no', fl_flat='yes', crval=23000.000000,
+                          cdelt=-2.115000, logfile=log)
 
         #fix bad pixels from the DQ plane
         iraf.nffixbad_anil('rsn@'+telluriclist[i], outpref='b', logfile=log)

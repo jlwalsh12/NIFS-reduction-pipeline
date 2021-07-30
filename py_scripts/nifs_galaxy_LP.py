@@ -128,15 +128,33 @@ def nifs_galaxy_LP(workdir, caldir, teldir, date, flatlist, arclist,
                                   logfile=log)
     
     #flat field and cut the object data
-    iraf.nsreduce('sn@'+gallist, fl_cut='yes', fl_nsappw='yes', fl_dark='no',
-                  fl_sky='no', fl_flat='yes', flatimage='rgn'+calflat+'_flat',
-                  fl_vardq='yes', logfile=log)
-    #flat field and cut the sky data
-    if len(darklist) > 0:
-        iraf.nsreduce('sn@'+skylistshort, fl_cut='yes', fl_nsappw='yes',
+
+    #use different nsreduce calls depending on the observational
+    #setup. the pipeline will have already quit if one of these two
+    #setups wasn't used.
+    if obs_setup == 'hk_2.20':
+        iraf.nsreduce('sn@'+gallist, fl_cut='yes', fl_nsappw='yes',
                       fl_dark='no', fl_sky='no', fl_flat='yes',
-                      flatimage='rgn'+calflat+'_flat', fl_vardq='yes',
+                      flatimage='rgn'+calflat+'_flat',
+                      fl_vardq='yes', logfile=log)
+        #flat field and cut the sky data
+        if len(darklist) > 0:
+            iraf.nsreduce('sn@'+skylistshort, fl_cut='yes', fl_nsappw='yes',
+                          fl_dark='no', fl_sky='no', fl_flat='yes',
+                          flatimage='rgn'+calflat+'_flat', fl_vardq='yes',
+                          logfile=log)
+    if obs_setup =='hk_2.30':
+        iraf.nsreduce('sn@'+gallist, fl_cut='yes', fl_nsappw='yes',
+                      fl_dark='no', fl_sky='no', fl_flat='yes',
+                      flatimage='rgn'+calflat+'_flat',
+                      fl_vardq='yes', crval=23000.000000, cdelt=-2.115000,
                       logfile=log)
+        #flat field and cut the sky data
+        if len(darklist) > 0:
+            iraf.nsreduce('sn@'+skylistshort, fl_cut='yes', fl_nsappw='yes',
+                          fl_dark='no', fl_sky='no', fl_flat='yes',
+                          flatimage='rgn'+calflat+'_flat', fl_vardq='yes',
+                          crval=23000.000000, cdelt=-2.115000, logfile=log)
     
     #interpolate over bad pixels flagged in the DQ plane for both the
     #data and the sky

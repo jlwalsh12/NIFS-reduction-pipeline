@@ -7,7 +7,7 @@ reduction tasks (or modified Gemini IRAF reduction tasks).
 
 def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                       arcdarklist, ronchilist, ronchidarklist, darklist,
-                      refdir, flinter_arc, flinter_sdist):
+                      refdir, flinter_arc, flinter_sdist, obs_setup):
 
     ###########################################################################
     #  STEP 1: Prepare IRAF  		                                      #
@@ -94,11 +94,26 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                     fl_vardq='yes', masktype='none', logfile=log)
     iraf.gemcombine('n//@'+flatdarklist, output='gn'+flatdark, fl_dqpr='yes',
                     fl_vardq='yes', masktype='none', logfile=log)
-    
-    iraf.nsreduce('gn'+calflat, fl_cut='yes', fl_nsappw='yes', fl_vardq='yes',
-                   fl_sky='no', fl_dark='no', fl_flat='no', logfile=log)
-    iraf.nsreduce('gn'+flatdark, fl_cut='yes', fl_nsappw='yes', fl_vardq='yes',
-                   fl_sky='no', fl_dark='no', fl_flat='no', logfile=log)
+
+    #use different calls to nsreduce depending on the observational
+    #setup. the pipeline will have already quit if one of these two
+    #setups were not used.
+    if obs_setup == 'hk_2.20':
+        iraf.nsreduce('gn'+calflat, fl_cut='yes', fl_nsappw='yes',
+                      fl_vardq='yes', fl_sky='no', fl_dark='no',
+                      fl_flat='no', logfile=log)
+        iraf.nsreduce('gn'+flatdark, fl_cut='yes', fl_nsappw='yes',
+                      fl_vardq='yes', fl_sky='no', fl_dark='no',
+                      fl_flat='no', logfile=log)
+    if obs_setup == 'hk_2.30':
+        iraf.nsreduce('gn'+calflat, fl_cut='yes', fl_nsappw='yes',
+                      fl_vardq='yes', fl_sky='no', fl_dark='no',
+                      fl_flat='no', crval=23000.000000, cdelt=-2.115000,
+                      logfile=log)
+        iraf.nsreduce('gn'+flatdark, fl_cut='yes', fl_nsappw='yes',
+                      fl_vardq='yes', fl_sky='no', fl_dark='no',
+                      fl_flat='no', crval=23000.000000, cdelt=-2.115000,
+                      logfile=log)
     
     #creating flat image, final name = rgnN....._sflat.fits
     iraf.nsflat('rgn'+calflat, darks='rgn'+flatdark,
@@ -159,11 +174,22 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                             logfile=log)
         else:
             iraf.copy('n'+arc[i]+'.fits','gn'+arc[i]+'.fits')
-    
-        iraf.nsreduce('gn'+arc[i], outpr='r', darki='gn'+arcdark,
-                      flati='rgn'+calflat+'_flat', fl_vardq='no', fl_cut='yes',
-                      fl_nsappw='yes', fl_sky='no', fl_dark='yes',fl_flat='yes',
-                      logfile=log)
+
+
+        #use different nsreduce calls depending on the observational
+        #setup. the pipeline will have already quit if one of these
+        #two setups were not used.
+        if obs_setup == 'hk_2.20':
+            iraf.nsreduce('gn'+arc[i], outpr='r', darki='gn'+arcdark,
+                          flati='rgn'+calflat+'_flat', fl_vardq='no',
+                          fl_cut='yes', fl_nsappw='yes', fl_sky='no',
+                          fl_dark='yes',fl_flat='yes', logfile=log)
+        if obs_setup == 'hk_2.30':
+            iraf.nsreduce('gn'+arc[i], outpr='r', darki='gn'+arcdark,
+                          flati='rgn'+calflat+'_flat', fl_vardq='no',
+                          fl_cut='yes', fl_nsappw='yes', fl_sky='no',
+                          fl_dark='yes',fl_flat='yes', crval=23000.000000,
+                          cdelt=-2.115000, logfile=log)
     
         #determine the wavelength of the observation and set the arc
         #coordinate file. if the user wishes to change the coordinate
@@ -179,12 +205,18 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
             clistobj="nifs$data/ArXe_Z.dat"
             my_threshobj=100.0
         elif bandobj == "K":
-            clistobj='anil_ArXe_K.dat'
             my_threshobj=50.0
+            #use different arc lists depending on the observational
+            #setup. the pipeline will have already quit if one of
+            #these two setups were not used.
+            if obs_setup == 'hk_2.20':
+                clistobj='anil_ArXe_K.dat'
+            if obs_setup == 'hk_2.30':
+                clistobj='anil_ArXe_KL.dat'
         else:
             clistobj="gnirs$data/argon.dat"
-            my_threshobj=100.0    
-    
+            my_threshobj=100.0
+            
         iraf.nswavelength('rgn'+arc[i], coordli=clistobj, nsum=10,
                           thresho=my_threshobj, fwidth=2.0, match=-6,
                           cradius=8.0, fl_inter=flinter_arc, nfound=10,
@@ -221,11 +253,21 @@ def nifs_basecalib_LP(workdir, date, flatlist, flatdarklist, arclist,
                         logfile=log)
     else:
         iraf.copy('n'+ronchiflatdark+'.fits','gn'+ronchiflatdark+'.fits')
-    
-    iraf.nsreduce('gn'+ronchiflat, outpref='r', dark='gn'+ronchiflatdark,
-                  flatimage='rgn'+calflat+'_flat', fl_cut='yes',
-                  fl_nsappw='yes', fl_flat='yes', fl_sky='no', fl_dark='yes',
-                  fl_vardq='no', logfile=log)
+
+    #use different nsreduce calls depending on the observational
+    #setup. the pipeline will have already quit if one of these two
+    #setups were not used.
+    if obs_setup == 'hk_2.20':
+        iraf.nsreduce('gn'+ronchiflat, outpref='r', dark='gn'+ronchiflatdark,
+                      flatimage='rgn'+calflat+'_flat', fl_cut='yes',
+                      fl_nsappw='yes', fl_flat='yes', fl_sky='no',
+                      fl_dark='yes', fl_vardq='no', logfile=log)
+    if obs_setup == 'hk_2.30':
+        iraf.nsreduce('gn'+ronchiflat, outpref='r', dark='gn'+ronchiflatdark,
+                      flatimage='rgn'+calflat+'_flat', fl_cut='yes',
+                      fl_nsappw='yes', fl_flat='yes', fl_sky='no',
+                      fl_dark='yes', fl_vardq='no', crval=23000.000000,
+                      cdelt=-2.115000, logfile=log)
 
     iraf.nfsdist_jonelle('rgn'+ronchiflat, fwidth=6.0, cradius=8.0, glshift=2.8,
                          minsep=6.5, thresh=2000.0, nlost=3,

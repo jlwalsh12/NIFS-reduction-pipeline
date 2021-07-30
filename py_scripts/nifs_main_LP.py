@@ -70,13 +70,13 @@ tellurics = ['hip105437','hip95793','hd203769','hip10559','hip18769'] #for 20160
 
 #you can chose to do some parts of the reduction and not others. to do
 #the step enter 'yes', to skip the step enter 'no'.
-reduce_sortfiles = 'no'      #create directory structure and sort files
+reduce_sortfiles = 'yes'      #create directory structure and sort files
 reduce_daycals = 'no'        #reduce daycals
 reduce_tellurics = 'no'      #reduce telluric stars
 reduce_galaxies = 'no'       #basic reduction of galaxy exposures
 reduce_combine_gal = 'no'    #merge galaxy cubes
 reduce_psf = 'no'            #reduce psf star observations
-reduce_combine_psf = 'yes'    #merge psf cubes
+reduce_combine_psf = 'no'    #merge psf cubes
 reduce_fluxcal = 'no'        #flux calibrate the merged galaxy and sky cubes
 reduce_measurelsf = 'no'     #measure the line-spread function from the
                               #merged sky cube
@@ -243,21 +243,33 @@ for a in range(len(dates)):
                 #outputs and start over.
                 nifs_checkdata_LP(workdir,'basecalib*log*')
 
+                #for HK, K grating centered on 2.20 microns
+                if obs_setups[b] == 'hk_2.20':
+                    arcfileref = '/anil_ArXe_K.dat'
+                #for HK, K-long grating centered on 2.30 microns
+                elif obs_setups[b] == 'hk_2.30':
+                    arcfileref = '/anil_ArXe_KL.dat'
+                #have the pipeline quit if one of these two setups
+                #were not used.
+                else:
+                    sys.exit('Pipeline is not written or tested for '+\
+                             'your observational setup.')
+                
                 #if refdir is too long, pyraf won't be able to find
                 #the reference file, so temporarily copy the arc line
                 #list to the working directory
-                tmp=subprocess.call(['cp',refdir+'/anil_ArXe_K.dat',workdir],
+                tmp=subprocess.call(['cp',refdir+arcfileref,workdir],
                                     stderr=open(os.devnull,'w'))
         
                 #reduce the baseline calibrations
                 nifs_basecalib_LP(workdir, dates[a], flatlist, flatdarklist,
-                                arclist, arcdarklist, ronchilist,
-                                ronchidarklist, darklist, refdir, flinter_arc,
-                                flinter_sdist)
+                                  arclist, arcdarklist, ronchilist,
+                                  ronchidarklist, darklist, refdir,
+                                  flinter_arc, flinter_sdist, obs_setups[b])
 
                 #remove the copy of the arc line list now that the
                 #daycals have been reduced
-                tmp=subprocess.call(['rm',workdir+'/anil_ArXe_K.dat'],
+                tmp=subprocess.call(['rm',workdir+arcfileref],
                                     stderr=open(os.devnull,'w'))
 
             ####################################################################
@@ -303,12 +315,21 @@ for a in range(len(dates)):
                         response = \
                         raw_input('Need to have a DS9 window open. Hit '+\
                                     'any key to continue. ')
+
+                    #only HK, K grating centered on 2.20 microns and
+                    #HK, K long grating centered on 2.30 microns is
+                    #supported. have the pipeline quit if one of these
+                    #two setups were not used.
+                    if obs_setups[b] != 'hk_2.20' and \
+                       obs_setups[b] != 'hk_2.30':
+                        sys.exit('Pipeline is not written or tested for '+\
+                                 'your observational setup.')
                 
                     #reduce the telluric stars
                     nifs_telluric_LP(workdir, caldir, dates[a], flatlist,
                                      arclist, ronchilist, telluriclist, skylist,
                                      skylistshort, flinter_nsfitcoords,
-                                     flinter_extract)
+                                     flinter_extract, obs_setups[b])
 
                     #remove absorption lines from the telluric star
                     #and correct for the blackbody shape. the output
@@ -316,7 +337,9 @@ for a in range(len(dates)):
                     #make the telluric correction.
                     telluric_file = sorted(glob.glob('gxtfbrsn*.fits'),
                                            key=os.path.basename)
-                    idl.pro('fit_telluric_richard',workdir,telluric_file,refdir)
+                    idl.pro('fit_telluric_richard',workdir,telluric_file,
+                            refdir,obs_setups[b])
+                        
 
 ################################################################################
 
@@ -377,6 +400,15 @@ for a in range(len(galaxies)):
                         response = \
                         raw_input('Need to have a DS9 window open. Hit '+\
                                   'any key to continue. ')
+
+                    #only HK, K grating centered on 2.20 microns and
+                    #HK, K long grating centered on 2.30 microns is
+                    #supported. have the pipeline quit if one of these
+                    #two setups were not used.
+                    if obs_setups[b] != 'hk_2.20' and \
+                       obs_setups[b] != 'hk_2.30':
+                        sys.exit('Pipeline is not written or tested for '+\
+                                 'your observational setup.')
                 
                     #reduce the galaxy exposures
                     nifs_galaxy_LP(workdir, caldir, teldir, dates[b], flatlist,
@@ -520,6 +552,15 @@ if reduce_psf.lower() == 'yes':
                             #and start over.
                             nifs_checkdata_LP(workdir,'psf_'+galaxies[c]+\
                                                   '*log*')
+
+                            #only HK, K grating centered on 2.20 microns and
+                            #HK, K long grating centered on 2.30 microns is
+                            #supported. have the pipeline quit if one of these
+                            #two setups were not used.
+                            if obs_setups[b] != 'hk_2.20' and \
+                               obs_setups[b] != 'hk_2.30':
+                                sys.exit('Pipeline is not written or tested'+\
+                                         ' for your observational setup.')
                 
                             #reduce the psf exposures
                             nifs_psf_LP(workdir, caldir, teldir, dates[a],
@@ -678,6 +719,14 @@ if reduce_fluxcal.lower() == 'yes':
                                            telstar_calib_file, galaxies[a],
                                            date_telstar, flinter_telluric)
 
+            #only HK, K grating centered on 2.20 microns and HK, K
+            #long grating centered on 2.30 microns is supported. have
+            #the pipeline quit if one of these two setups were not
+            #used.
+            if obs_setups[b] != 'hk_2.20' and obs_setups[b] != 'hk_2.30':
+                sys.exit('Pipeline is not written or tested'+\
+                         ' for your observational setup.')
+            
             #determine the multiplicative conversion factor to convert
             #from counts/s to ergs/s/cm^2/A. then apply to the merged
             #galaxy and sky cubes.
@@ -717,8 +766,17 @@ if reduce_measurelsf.lower() == 'yes':
             print('Measuring the LSF as a function of spatial location from'+\
                       ' the merged sky cube...')
 
+            #only HK, K grating centered on 2.20 microns and HK, K
+            #long grating centered on 2.30 microns is supported. have
+            #the pipeline quit if one of these two setups were not
+            #used.
+            if obs_setups[b] != 'hk_2.20' and obs_setups[b] != 'hk_2.30':
+                sys.exit('Pipeline is not written or tested'+\
+                         ' for your observational setup.')
+
             #fit Gaussians to the sky lines
-            idl.pro('measure_lsf_lp',workdir,skycube,refdir,galaxies[a])
+            idl.pro('measure_lsf_lp',workdir,skycube,refdir,galaxies[a],
+                    obs_setups[b])
 
             print('The LSF map is called '+\
                   '%s_fullskycube_fwhm_med.fits in %s ' % (galaxies[a],workdir))

@@ -107,9 +107,21 @@ def nifs_psf_LP(workdir, caldir, teldir, date, flatlist, arclist, ronchilist,
                        fl_vardq='yes', logfile=log)
 
     #flat field and cut the psf
-    iraf.nsreduce('sn@'+psflist, fl_cut='yes', fl_nsappw='yes', fl_dark='no',
-                   fl_sky='no', fl_flat='yes', flatimage='rgn'+calflat+'_flat',
-                   fl_vardq='yes', logfile=log)
+
+    #use different nsreduce calls depending on the observational
+    #setup. the pipeline should already quit if one of these two
+    #setups were not used.
+    if obs_setup == 'hk_2.20':
+        iraf.nsreduce('sn@'+psflist, fl_cut='yes', fl_nsappw='yes',
+                      fl_dark='no', fl_sky='no', fl_flat='yes',
+                      flatimage='rgn'+calflat+'_flat',
+                      fl_vardq='yes', logfile=log)
+    if obs_setup == 'hk_2.30':
+        iraf.nsreduce('sn@'+psflist, fl_cut='yes', fl_nsappw='yes',
+                      fl_dark='no', fl_sky='no', fl_flat='yes',
+                      flatimage='rgn'+calflat+'_flat',
+                      fl_vardq='yes', crval=23000.000000, cdelt=-2.115000,
+                      logfile=log)
     
     #interpolate over bad pixels flagged in the DQ plane for the psf
     iraf.nffixbad_anil('rsn@'+psflist,logfile=log)
