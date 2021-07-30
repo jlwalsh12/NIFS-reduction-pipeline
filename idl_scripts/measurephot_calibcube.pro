@@ -73,7 +73,14 @@ targetflux=jyflux*1.D-23*2.99792D18/(isolambda)^2
 ;calculate the ratio between the known flux (ergs/s/cm^2/A) and the
 ;pixel flux (counts/s) at the isophotal wavelength. need to
 ;interpolate to get values at the isophotal wavelength.
-lowind=where(lambda GT 2.02D4 AND lambda LT 2.14D4)
+;set the lower indices depending on the observational setup since the
+;starting wavelength for hk_2.30 is at a longer wavelength than
+;hk_2.20. if one of these two observational setups was not used, then
+;the pipeline would have already quit.
+if obs_setup EQ 'hk_2.20' then $
+   lowind=where(lambda GT 2.02D4 AND lambda LT 2.14D4)
+if obs_setup EQ 'hk_2.30' then $
+   lowind=where(lambda GT 2.106D4 AND lambda LT 2.14D4)
 highind=where(lambda GT 2.19D4 AND lambda LT 2.4D4)
 ind=[lowind,highind]
 fitpar=poly_fit(lambda[ind],spec[ind],3)

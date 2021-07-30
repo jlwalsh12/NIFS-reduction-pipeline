@@ -1,9 +1,12 @@
-pro measure_lsf_lp, workdir, skycube, refdir, galaxy
+pro measure_lsf_lp, workdir, skycube, refdir, galaxy, obs_setup
 
 ;this routine measures the line-spread-function using a sky cube. at
-;each spatial location, 13 OH lines between 2.0 and 2.25 microns are
-;fit with gaussians, and the median FWHM (in Angstroms) of the lines
-;for that spaxel is saved to an output fits file.
+;each spatial location, OH lines are fit with gaussians and the median
+;FWHM (in Angstroms) of the lines for that spaxel is saved to an
+;output fits file. for a setup with HK, K grating on 2.20 microns, 13
+;OH lines between 2.0 and 2.25 microns are fit. for a setup with HK, K
+;grating on 2.30 microns, 9 OH lines between 2.0 and 2.25 microns are
+;fit.
   
 COMMON skyblock, gauss_sep
 
@@ -25,8 +28,17 @@ readcol,refdir+'rousselot2000.dat',skylambda,skyint,format='F,F',$
         skip=28, /silent
 ;these lines all have close doublets except 21955 line and are
 ;relatively isolated
-uselambda=double([20339.,20412.7,20563.5,20729.0,21176.,21802.3,21955.6,$
-                  22052.,22125.5,22247.,22312.7,22460.0,22517.9])
+;depends on the observational setup. if one of these setups were not
+;used, then the pipeline will have quit already.
+if obs_setup EQ 'hk_2.20' then $
+   uselambda=double([20339.,20412.7,20563.5,20729.0,21176.,21802.3,21955.6,$
+                     22052.,22125.5,22247.,22312.7,22460.0,22517.9])
+;note, there are also lines at 22690.4, 22742.0, 22939.1, 22985.5, but
+;they are not that strong and not that isolated and the fits are not
+;very good to those additional lines.
+if obs_setup EQ 'hk_2.30' then $
+   uselambda=double([21176.,21802.3,21955.6, 22052.,22125.5,22247.,22312.7,$
+                     22460.0,22517.9])
 nlines=n_elements(uselambda)
 reflambda=dblarr(nlines,2)
 for i=0,nlines-1 do begin

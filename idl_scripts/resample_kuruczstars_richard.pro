@@ -7,22 +7,25 @@ pro resample_kuruczstars_richard
 ;
 ; Kurucz spectra from: kurucz.harvard.edu/stars/
 
-
-libfile = '/Users/jlwalsh/Data/LP_2016/nifs_reduction_info/full_reduce/'+$
-          'nifs_pipeline_v4/ref_files/kurucz_all.lib'
-; Ang/pix
+libdir = '/home/student/nifs_reduction/ref_files/kurucz_stars/'
+libfile = '/home/student/nifs_reduction/ref_files/kurucz_all.lib'
+; ang/pix
 stepsize = 1.0
-; Useful range for NIFS, in Ang. Also sets new wavelength sampling,
-; together with stepsize
-wlim = [9400.,25000.]
+; useful range for NIFS, in ang. also sets new wavelength sampling,
+; together with stepsize.
+; works for HK, K grating centered on 2.20 microns.
+;wlim = [9400.,25000.]
+; works for HK, K long grating centered on 2.30 microns (and centered
+; on 2.20 microns).
+wlim = [9400.,40000.]
 
-readcol,libfile,libdir,f='a',numline=1,/silent
-readcol,libfile,files,f='a',skipline=1,/silent
+
+readcol,libfile,files,f='a',skipline=0,/silent
 nfiles = n_elements(files)
 
 for i=0,nfiles-1 do begin
    
-   readcol,libdir[0]+files[i],lsun,fsun,/silent
+   readcol,libdir+files[i],lsun,fsun,/silent
    ; Put into Angstrom
    lsun = 10.0*lsun
    ; Truncate to useful region
@@ -39,7 +42,7 @@ for i=0,nfiles-1 do begin
    fnew = interpol(fsun, lsun, lnew, /spline)
 
    ; Write out the file
-   forprint,lnew,fnew,textout=libdir[0]+files[i]+'_resamp',/silent,$
+   forprint,lnew,fnew,textout=libdir+files[i]+'_resamp',/silent,$
             comment='#Vac. Wavelength (ang), Flux (ergs/cm^2/s/ster/nm)'
 
 endfor

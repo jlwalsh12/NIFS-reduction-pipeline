@@ -1,4 +1,4 @@
-pro fit_telluric_richard, workdir, telluric_file, refdir
+pro fit_telluric_richard, workdir, telluric_file, refdir, obs_setup
 
 ;Create the 1D telluric correction spectrum using the combined 1D
 ;spectrum of a (A0 V) telluric star. Remove the absorption line(s) and
@@ -87,15 +87,10 @@ for i=0, n_elements(telluric_file)-1 do begin
    ;==========
    ;
    s = size(temp2)
-   goodpixels = [cap_range(30,s[1]-30)]
-   case grating of
-      "Z":goodpixels = [cap_range(900,1300),cap_range(2600,3000)]+100
-      "J":goodpixels = [cap_range(30,s[1]-30)]
-      "H":goodpixels = [cap_range(30,s[1]-30)]
-      ;"K":goodpixels = [cap_range(1300,1800)]
-      "K":goodpixels = [cap_range(1300,1950)]
-      else:
-   endcase
+   ; if one of the two setups below was not used, the pipeline will
+   ; have already quit.
+   if obs_setup EQ 'hk_2.20' then goodpixels = [cap_range(1300,1950)]
+   if obs_setup EQ 'hk_2.30' then goodpixels = [cap_range(300,900)]
    
    ;==========
    ; Run pPXF; the template spectra are flux calibrated
